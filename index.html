@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Auth Portal — Private OAuth Configuration Utility</title>
+  <meta name="description" content="Private OAuth configuration utility and administrative portal for a single-user Tailscale network integration." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0b0c0e" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-base: #0b0c0e;
+      --bg-elevated: #121417;
+      --bg-Interactive: #181b20;
+      --surface-highlight: rgba(255, 255, 255, 0.03);
+      --border-hairline: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-primary: #e5e7eb;
+      --accent-teal: #2dd4bf;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --max-width: 760px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-base);
+      background-image: radial-gradient(
+        ellipse 80% 50% at 50% -15%,
+        rgba(255, 255, 255, 0.045),
+        transparent 70%
+      );
+      selection-background-color: rgba(255, 255, 255, 0.14);
+    }
+
+    ::selection {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    /* Sticky Minimalist Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background-color: rgba(11, 12, 14, 0.82);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .header-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9375rem;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s ease;
+    }
+
+    .brand-link:hover {
+      opacity: 0.85;
+    }
+
+    .brand-mark {
+      width: 18px;
+      height: 18px;
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      opacity: 0.9;
+    }
+
+    .brand-mark span {
+      background-color: var(--text-muted);
+      border-radius: 1.5px;
+    }
+
+    .brand-mark span.active {
+      background-color: var(--text-primary);
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 450;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      transition: color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      color: var(--text-primary);
+      background-color: var(--surface-highlight);
+      outline: none;
+    }
+
+    .nav-link.active {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+
+    /* Section Structure */
+    .portal-section {
+      scroll-margin-top: 5.5rem;
+    }
+
+    .section-index {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .section-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .anchor-copy-btn {
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .anchor-copy-btn:hover,
+    .anchor-copy-btn:focus-visible {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background-color: var(--surface-highlight);
+      outline: none;
+    }
+
+    /* Hero / Home Section */
+    .hero-block {
+      padding: 0.5rem 0 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 2.625rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+    }
+
+    .lead-description {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      max-width: 64ch;
+      margin-bottom: 2rem;
+    }
+
+    .metadata-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1px;
+      background-color: var(--border-hairline);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .metadata-item {
+      background-color: var(--bg-elevated);
+      padding: 1rem 1.125rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metadata-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .metadata-value {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Content Surface for Policy Sections */
+    .document-surface {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .document-surface:hover {
+      border-color: var(--border-strong);
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .document-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.96875rem;
+      line-height: 1.72;
+    }
+
+    .document-body p strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .spec-list {
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-hairline);
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem 1.5rem;
+    }
+
+    .spec-list li {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .spec-list li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-hairline);
+      padding: 2rem 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 600px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.875rem 1.25rem;
+      }
+
+      .site-nav {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+      }
+
+      main {
+        padding: 2.25rem 1.25rem 3.5rem;
+        gap: 2.75rem;
+      }
+
+      .document-surface {
+        padding: 1.375rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="top-header">
+    <div class="header-inner">
+      <a href="#home" class="brand-link" id="brand-home-link" aria-label="Personal Auth Portal Home">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="active"></span><span></span><span class="active"></span>
+          <span></span><span class="active"></span><span></span>
+          <span class="active"></span><span class="active"></span><span></span>
+        </span>
+        <span>Personal Auth Portal</span>
+      </a>
+      <nav class="site-nav" aria-label="Section navigation">
+        <a href="#home" class="nav-link active" id="nav-home">Home</a>
+        <a href="#privacy" class="nav-link" id="nav-privacy">Privacy Policy</a>
+        <a href="#terms" class="nav-link" id="nav-terms">Terms of Service</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Home / Landing Section -->
+    <section id="home" class="portal-section" aria-labelledby="heading-home">
+      <div class="section-index">
+        <span class="section-code">01 / Overview</span>
+        <button type="button" class="anchor-copy-btn" id="copy-home-url" data-section="home" aria-label="Copy Home section URL">
+          #home
+        </button>
+      </div>
+      <div class="hero-block">
+        <h1 id="heading-home">Personal Auth Portal</h1>
+        <p class="lead-description">
+          This portal is a private configuration utility designed exclusively for a single-user Tailscale network integration. It serves as the designated OAuth verification endpoint to facilitate localized credential handshakes across an authenticated private mesh.
+        </p>
+        <div class="metadata-strip" role="region" aria-label="Deployment specifications">
+          <div class="metadata-item">
+            <span class="metadata-label">Network Scope</span>
+            <span class="metadata-value">Private Tailnet Mesh</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Access Model</span>
+            <span class="metadata-value">Single-User Administrative</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Token Custody</span>
+            <span class="metadata-value">Strictly Local Environment</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Privacy Policy Section -->
+    <section id="privacy" class="portal-section" aria-labelledby="heading-privacy">
+      <div class="section-index">
+        <span class="section-code">02 / Data Governance</span>
+        <button type="button" class="anchor-copy-btn" id="copy-privacy-url" data-section="privacy" aria-label="Copy Privacy Policy section URL">
+          #privacy
+        </button>
+      </div>
+      <div class="document-surface">
+        <h2 id="heading-privacy">Privacy Policy</h2>
+        <div class="document-body">
+          <p>
+            <strong>Zero Data Collection:</strong> This application does not collect, track, store, log, or share any user data, personal information, telemetry, cookies, or analytics of any kind.
+          </p>
+          <p>
+            <strong>Localized Token Handling:</strong> All authentication tokens, OAuth authorization codes, and session credentials generated during the authorization flow remain strictly localized to the user's private environment and authenticated Tailscale network nodes. No credentials or identity payloads are transmitted to, retained by, or accessible from any external third-party server.
+          </p>
+          <ul class="spec-list" aria-label="Privacy guarantees">
+            <li>No Personal Data Storage</li>
+            <li>No Third-Party Analytics</li>
+            <li>No External Token Relay</li>
+            <li>Local Environment Custody Only</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Terms of Service Section -->
+    <section id="terms" class="portal-section" aria-labelledby="heading-terms">
+      <div class="section-index">
+        <span class="section-code">03 / Usage Terms</span>
+        <button type="button" class="anchor-copy-btn" id="copy-terms-url" data-section="terms" aria-label="Copy Terms of Service section URL">
+          #terms
+        </button>
+      </div>
+      <div class="document-surface">
+        <h2 id="heading-terms">Terms of Service</h2>
+        <div class="document-body">
+          <p>
+            <strong>Private Administrative Use Only:</strong> This utility is operated strictly for private, individual administrative use by the system owner to manage personal Tailscale network integrations. Public registration, multi-tenant access, and commercial distribution are neither offered nor permitted.
+          </p>
+          <p>
+            <strong>No Warranties ("As-Is"):</strong> This software and configuration portal are provided strictly "as-is" and "as-available," without any express or implied warranties of any kind, including but not limited to implied warranties of merchantability, fitness for a particular purpose, availability, or non-infringement. The administrator assumes full responsibility for local credential lifecycle management.
+          </p>
+          <ul class="spec-list" aria-label="Terms summary">
+            <li>Single-Owner Operation</li>
+            <li>Non-Commercial Utility</li>
+            <li>Provided Strictly "As-Is"</li>
+            <li>No Express or Implied Warranties</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Personal Auth Portal &mdash; Private Tailscale OAuth Endpoint</span>
+      <div class="footer-links">
+        <a href="#home" id="footer-home">Home</a>
+        <a href="#privacy" id="footer-privacy">Privacy Policy</a>
+        <a href="#terms" id="footer-terms">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sections = document.querySelectorAll('.portal-section');
+      const copyButtons = document.querySelectorAll('.anchor-copy-btn');
+
+      function updateActiveLink() {
+        const hash = window.location.hash || '#home';
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === hash);
+        });
+      }
+
+      window.addEventListener('hashchange', updateActiveLink);
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const id = '#' + entry.target.id;
+                navLinks.forEach((link) => {
+                  link.classList.toggle('active', link.getAttribute('href') === id);
+                });
+              }
+            });
+          },
+          { rootMargin: '-25% 0px -60% 0px', threshold: 0 }
+        );
+        sections.forEach((section) => observer.observe(section));
+      }
+
+      copyButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const section = btn.getAttribute('data-section');
+          const url = new URL(window.location.href);
+          url.hash = section;
+          window.history.replaceState(null, '', '#' + section);
+          updateActiveLink();
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url.toString()).then(() => {
+              const original = btn.textContent.trim();
+              btn.textContent = 'Copied URL';
+              setTimeout(() => {
+                btn.textContent = original;
+              }, 1400);
+            });
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
