@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Personal Auth Portal — Private OAuth Configuration Utility</title>
-  <meta name="description" content="Private OAuth configuration utility and administrative portal for a single-user Tailscale network integration." />
+  <title>Benflix — Personal Auth Portal &amp; Terms</title>
+  <meta name="description" content="Benflix personal OAuth configuration portal, privacy policy, and terms of service for a private single-user Tailscale network integration." />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#0b0c0e" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,7 +14,7 @@
     :root {
       --bg-base: #0b0c0e;
       --bg-elevated: #121417;
-      --bg-Interactive: #181b20;
+      --bg-interactive: #181b20;
       --surface-highlight: rgba(255, 255, 255, 0.03);
       --border-hairline: rgba(255, 255, 255, 0.08);
       --border-strong: rgba(255, 255, 255, 0.15);
@@ -22,7 +22,6 @@
       --text-secondary: #9ca3af;
       --text-muted: #6b7280;
       --accent-primary: #e5e7eb;
-      --accent-teal: #2dd4bf;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --max-width: 760px;
@@ -55,7 +54,6 @@
         rgba(255, 255, 255, 0.045),
         transparent 70%
       );
-      selection-background-color: rgba(255, 255, 255, 0.14);
     }
 
     ::selection {
@@ -90,7 +88,7 @@
       gap: 0.625rem;
       color: var(--text-primary);
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 0.9375rem;
       letter-spacing: -0.01em;
       transition: opacity 0.15s ease;
@@ -219,13 +217,43 @@
       font-size: 1.125rem;
       line-height: 1.7;
       color: var(--text-secondary);
-      max-width: 64ch;
-      margin-bottom: 2rem;
+      max-width: 65ch;
+      margin-bottom: 1.5rem;
+    }
+
+    .home-terms-summary {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    .home-terms-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+    }
+
+    .home-terms-text {
+      font-size: 0.95rem;
+      line-height: 1.68;
+      color: var(--text-secondary);
+    }
+
+    .home-terms-text strong {
+      color: var(--text-primary);
+      font-weight: 500;
     }
 
     .metadata-strip {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
       gap: 1px;
       background-color: var(--border-hairline);
       border: 1px solid var(--border-hairline);
@@ -370,7 +398,8 @@
         gap: 2.75rem;
       }
 
-      .document-surface {
+      .document-surface,
+      .home-terms-summary {
         padding: 1.375rem;
       }
     }
@@ -379,13 +408,13 @@
 <body>
   <header class="site-header" id="top-header">
     <div class="header-inner">
-      <a href="#home" class="brand-link" id="brand-home-link" aria-label="Personal Auth Portal Home">
+      <a href="#home" class="brand-link" id="brand-home-link" aria-label="Benflix Personal Auth Portal Home">
         <span class="brand-mark" aria-hidden="true">
           <span class="active"></span><span></span><span class="active"></span>
           <span></span><span class="active"></span><span></span>
           <span class="active"></span><span class="active"></span><span></span>
         </span>
-        <span>Personal Auth Portal</span>
+        <span>Benflix &mdash; Personal Auth Portal</span>
       </a>
       <nav class="site-nav" aria-label="Section navigation">
         <a href="#home" class="nav-link active" id="nav-home">Home</a>
@@ -399,17 +428,32 @@
     <!-- 1. Home / Landing Section -->
     <section id="home" class="portal-section" aria-labelledby="heading-home">
       <div class="section-index">
-        <span class="section-code">01 / Overview</span>
+        <span class="section-code">01 / Benflix Overview &amp; Governing Terms</span>
         <button type="button" class="anchor-copy-btn" id="copy-home-url" data-section="home" aria-label="Copy Home section URL">
           #home
         </button>
       </div>
       <div class="hero-block">
-        <h1 id="heading-home">Personal Auth Portal</h1>
+        <h1 id="heading-home">Benflix — Personal Auth Portal</h1>
         <p class="lead-description">
-          This portal is a private configuration utility designed exclusively for a single-user Tailscale network integration. It serves as the designated OAuth verification endpoint to facilitate localized credential handshakes across an authenticated private mesh.
+          Benflix is a private configuration utility and self-hosted media administration portal designed exclusively for a single-user Tailscale network integration. It acts as the designated OAuth verification endpoint to authenticate localized services across an isolated, owner-operated private mesh.
         </p>
-        <div class="metadata-strip" role="region" aria-label="Deployment specifications">
+
+        <div class="home-terms-summary" role="region" aria-label="Benflix Governing Terms and Privacy Summary">
+          <span class="home-terms-title">Benflix Core Operating Terms &amp; Privacy Commitments</span>
+          <p class="home-terms-text">
+            <strong>1. Zero Data Collection &amp; Strict Local Custody:</strong> Benflix does not collect, track, store, log, or share any user data, personal information, cookies, telemetry, or analytics. All OAuth authentication tokens and session credentials remain strictly localized to the administrator's private environment and authenticated Tailscale nodes.
+          </p>
+          <p class="home-terms-text">
+            <strong>2. Private Administrative Use &amp; "As-Is" Provision:</strong> Benflix is operated solely for private, individual administrative use by the system owner with no public access or commercial distribution. The Benflix portal and underlying integration utilities are provided strictly "as-is" and "as-available" without any express or implied warranties of any kind.
+          </p>
+        </div>
+
+        <div class="metadata-strip" role="region" aria-label="Benflix deployment specifications">
+          <div class="metadata-item">
+            <span class="metadata-label">Application</span>
+            <span class="metadata-value">Benflix</span>
+          </div>
           <div class="metadata-item">
             <span class="metadata-label">Network Scope</span>
             <span class="metadata-value">Private Tailnet Mesh</span>
@@ -429,21 +473,21 @@
     <!-- 2. Privacy Policy Section -->
     <section id="privacy" class="portal-section" aria-labelledby="heading-privacy">
       <div class="section-index">
-        <span class="section-code">02 / Data Governance</span>
+        <span class="section-code">02 / Benflix Data Governance</span>
         <button type="button" class="anchor-copy-btn" id="copy-privacy-url" data-section="privacy" aria-label="Copy Privacy Policy section URL">
           #privacy
         </button>
       </div>
       <div class="document-surface">
-        <h2 id="heading-privacy">Privacy Policy</h2>
+        <h2 id="heading-privacy">Benflix Privacy Policy</h2>
         <div class="document-body">
           <p>
-            <strong>Zero Data Collection:</strong> This application does not collect, track, store, log, or share any user data, personal information, telemetry, cookies, or analytics of any kind.
+            <strong>Zero Data Collection:</strong> The Benflix application and Personal Auth Portal do not collect, track, store, log, or share any user data, personal information, telemetry, cookies, or analytics of any kind.
           </p>
           <p>
-            <strong>Localized Token Handling:</strong> All authentication tokens, OAuth authorization codes, and session credentials generated during the authorization flow remain strictly localized to the user's private environment and authenticated Tailscale network nodes. No credentials or identity payloads are transmitted to, retained by, or accessible from any external third-party server.
+            <strong>Localized Token Handling:</strong> All authentication tokens, OAuth authorization codes, and session credentials generated during the Benflix authorization flow remain strictly localized to the user's private environment and authenticated Tailscale network nodes. No credentials or identity payloads are transmitted to, retained by, or accessible from any external third-party server.
           </p>
-          <ul class="spec-list" aria-label="Privacy guarantees">
+          <ul class="spec-list" aria-label="Benflix privacy guarantees">
             <li>No Personal Data Storage</li>
             <li>No Third-Party Analytics</li>
             <li>No External Token Relay</li>
@@ -456,21 +500,21 @@
     <!-- 3. Terms of Service Section -->
     <section id="terms" class="portal-section" aria-labelledby="heading-terms">
       <div class="section-index">
-        <span class="section-code">03 / Usage Terms</span>
+        <span class="section-code">03 / Benflix Usage Terms</span>
         <button type="button" class="anchor-copy-btn" id="copy-terms-url" data-section="terms" aria-label="Copy Terms of Service section URL">
           #terms
         </button>
       </div>
       <div class="document-surface">
-        <h2 id="heading-terms">Terms of Service</h2>
+        <h2 id="heading-terms">Benflix Terms of Service</h2>
         <div class="document-body">
           <p>
-            <strong>Private Administrative Use Only:</strong> This utility is operated strictly for private, individual administrative use by the system owner to manage personal Tailscale network integrations. Public registration, multi-tenant access, and commercial distribution are neither offered nor permitted.
+            <strong>Private Administrative Use Only:</strong> Benflix and this configuration utility are operated strictly for private, individual administrative use by the system owner to manage personal Tailscale network integrations. Public registration, multi-tenant access, and commercial distribution are neither offered nor permitted.
           </p>
           <p>
-            <strong>No Warranties ("As-Is"):</strong> This software and configuration portal are provided strictly "as-is" and "as-available," without any express or implied warranties of any kind, including but not limited to implied warranties of merchantability, fitness for a particular purpose, availability, or non-infringement. The administrator assumes full responsibility for local credential lifecycle management.
+            <strong>No Warranties ("As-Is"):</strong> Benflix and this authentication portal are provided strictly "as-is" and "as-available," without any express or implied warranties of any kind, including but not limited to implied warranties of merchantability, fitness for a particular purpose, availability, or non-infringement. The administrator assumes full responsibility for local credential lifecycle management.
           </p>
-          <ul class="spec-list" aria-label="Terms summary">
+          <ul class="spec-list" aria-label="Benflix terms summary">
             <li>Single-Owner Operation</li>
             <li>Non-Commercial Utility</li>
             <li>Provided Strictly "As-Is"</li>
@@ -483,7 +527,7 @@
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span>Personal Auth Portal &mdash; Private Tailscale OAuth Endpoint</span>
+      <span>Benflix &mdash; Personal Auth Portal &amp; Private Tailscale OAuth Endpoint</span>
       <div class="footer-links">
         <a href="#home" id="footer-home">Home</a>
         <a href="#privacy" id="footer-privacy">Privacy Policy</a>
